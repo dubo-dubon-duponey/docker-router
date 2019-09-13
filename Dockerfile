@@ -85,6 +85,7 @@ USER        $BUILD_USER
 ENV         STAGING=""
 ENV         EMAIL="dubo-dubon-duponey@jsboot.space"
 ENV         CADDYPATH=$CADDYPATH
+ENV         DOMAIN=somewhere.tld
 ENV         PORT=1443
 
 EXPOSE      $PORT

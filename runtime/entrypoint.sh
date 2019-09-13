@@ -21,4 +21,4 @@ args=(caddy -conf /config/config.conf -agree -disable-http-challenge -https-port
 
 [ ! "$STAGING" ] || args+=(-ca https://acme-staging-v02.api.letsencrypt.org/directory)
 
-exec "${args[@]}"
+exec "${args[@]}" "$@"
