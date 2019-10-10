@@ -1,55 +1,106 @@
 # What
 
-A docker image for [Caddy](https://github.com/caddyserver/caddy/).
+Docker image for a HTTPS routing server.
 
- * multi-architecture (linux/amd64, linux/arm64, linux/arm/v7, linux/arm/v6)
- * based on debian:buster-slim
- * no cap needed
- * running as a non-root user
- * lightweight (~40MB)
- * no plugins (but you can customize at build time if you want)
- * no HTTP exposed (just HTTPS)
+This is based on [Caddy](https://github.com/caddyserver/caddy/).
+
+## Image features
+
+ * multi-architecture:
+    * [✓] linux/amd64
+    * [✓] linux/arm64
+    * [✓] linux/arm/v7
+    * [✓] linux/arm/v6
+ * hardened:
+    * [✓] image runs read-only
+    * [✓] image runs with no capabilities
+    * [✓] process runs as a non-root user, disabled login, no shell
+ * lightweight
+    * [✓] based on `debian:buster-slim`
+    * [✓] simple entrypoint script
+    * [✓] multi-stage build with no installed dependencies for the runtime image
 
 ## Run
 
 ```bash
-chown -R 1000:1000 "[host_path1]"
-chown -R 1000:1000 "[host_path2]"
-chown -R 1000:1000 "[host_path3]"
-
 docker run -d \
+    --env DOMAIN=something.mydomain.com \
+    --env EMAIL=me@mydomain.com \
     --net=bridge \
-    --env EMAIL=me@somwhere.tld \
-    --volume [host_path1]:/config \
-    --volume [host_path2]:/data \
-    --volume [host_path3]:/certs \
-    --publish 443:1443 \
+    --publish 443:1443/tcp \
     --cap-drop ALL \
+    --read-only \
     dubodubonduponey/caddy:v1
 ```
 
+You do need to expose port 443 publicly from your docker host so that LetsEncrypt can issue your certificate.
+
 ## Notes
 
-### Network
+## Notes
 
- * if you intend on running on port 443, you must use `bridge` and publish the port
- * if using `host` or `macvlan`, you will not be able to use a privileged port
+### Custom configuration file
 
-### Configuration
+If you want to customize your Caddy config, mount a volume into `/config` on the container and customize `/config/caddy.conf`.
 
-The `DOMAIN` environment variable is meant as a convenience to test the default configuration file
-(which is really a hello world).
+```bash
+chown -R 1000:nogroup "[host_path_for_config]"
 
-For anything beyond that, you should roll your own configuration, inside `[host_path1]/config.conf` (mounted on `/config`).
+docker run -d \
+    --volume [host_path_for_config]:/config:ro \
+    --env DOMAIN=something.mydomain.com \
+    --env EMAIL=me@mydomain.com \
+    --net=bridge \
+    --publish 443:1443 \
+    --cap-drop ALL \
+    --read-only \
+    dubodubonduponey/caddy:v1
+```
 
-`[host_path2]` (mounted on `/data`) is meant to hold files you might want to serve.
+### Networking
 
-Technically, caddy does not need write access to these two.
+If you want to use another networking mode but `bridge` (and run the service on standard ports), you have to run the container as `root`, grant the appropriate `cap` and set the ports:
 
-`[host_path3]` (mounted on `/certs`), on the other hand, will be used by caddy for cert management and renewal (hence must be writable).
+```
+docker run -d \
+    --env DOMAIN=something.mydomain.com \
+    --env EMAIL=me@mydomain.com \
+    --net=host \
+    --env HTTPS_PORT=443 \
+    --cap-add=CAP_NET_BIND_SERVICE \
+    --user=root \
+    --cap-drop ALL \
+    --read-only \
+    dubodubonduponey/caddy:v1
+```
 
-Guest access does not work currently, and is disabled.
+### Configuration reference
 
-### Advanced configuration
+The default setup uses a Caddy config file in `/config/caddy.conf` that sets-up a basic https server.
 
-Any additional arguments provided when running the image will get fed to the `caddy` binary.
+ * the `/certs` folder is used to store letsencrypt certificates (it's a volume by default, which you may want to mount)
+ * the `/config` folder holds the configuration
+
+#### Runtime
+
+You may specify the following environment variables at runtime:
+
+ * DOMAIN (eg: `something.mydomain.com`) controls the domain name of your server
+ * EMAIL (eg: `me@mydomain.com`) controls the email used to issue your server certificate
+ * STAGING (empty by default) controls whether you want to use LetsEncrypt staging environment (useful when debugging so not to burn your quota)
+
+You can also tweak the following for control over which internal ports are being used (useful if intend to run with host/macvlan, see above)
+
+ * HTTPS_PORT
+
+Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and a root user.
+
+Finally, any additional arguments provided when running the image will get fed to the `coredns` binary.
+
+#### Build time
+
+You can rebuild the image using the following build arguments:
+
+ * BUILD_UID
+ 
+So to control which user-id to assign to the in-container user.
