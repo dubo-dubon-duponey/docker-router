@@ -14,6 +14,8 @@ RUN         update-ca-certificates
 
 WORKDIR     /build
 
+ARG         TARGETPLATFORM
+
 # Versions: v2 2019/09/10
 #XXX BROKEN ARG         CADDY_VERSION=44b7ce98505ab8a34f6c632e661dd2cfae475a17
 
@@ -23,7 +25,6 @@ WORKDIR     /build
 
 # v1.0.3
 ARG         CADDY_VERSION=bff2469d9d76ba5924f6d9affcf60bf44dcfa06c
-ARG         TARGETPLATFORM
 
 # Checkout and build
 WORKDIR     /go/src/github.com/caddyserver/caddy
@@ -36,7 +37,7 @@ COPY        main.go .
 
 # Build it
 RUN         arch=${TARGETPLATFORM#*/} && \
-            env GOOS=linux GOARCH=${arch%/*} GO111MODULE=on go build
+            env GOOS=linux GOARCH=${arch%/*} go build
 
 #######################
 # Running image
@@ -55,43 +56,47 @@ ARG         BUILD_UID=1000
 ARG         BUILD_GROUP=$BUILD_USER
 ARG         BUILD_GID=$BUILD_UID
 
-ARG         CONFIG=/config
-ARG         DATA=/data
-ARG         CADDYPATH=/certs
-
 # Get relevant bits from builder
-COPY        --from=builder /etc/ssl/certs /etc/ssl/certs
+COPY        --from=builder /etc/ssl/certs                                       /etc/ssl/certs
 COPY        --from=builder /go/src/github.com/caddyserver/caddy/cmd/caddy/caddy /bin/caddy
 
 # Get relevant local files into cwd
 COPY        runtime .
 
-# Set links
-RUN         mkdir $CONFIG && mkdir $DATA && mkdir $CADDYPATH && \
-            chown $BUILD_UID:$BUILD_GID $CONFIG && chown $BUILD_UID:$BUILD_GID $DATA && chown $BUILD_UID:$BUILD_GID $CADDYPATH && \
-            ln -sf /dev/stdout access.log && \
-            ln -sf /dev/stderr error.log
-
-# Create user
+# Create user, set permissions
+# 002 so that both owner (eg: USER) and group (eg: in case we want to run as root) can manipulate the content of these folders
+# This only matters if this is not mounted from the host, using root
 RUN         addgroup --system --gid $BUILD_GID $BUILD_GROUP && \
             adduser --system --disabled-login --no-create-home --home /nonexistent --shell /bin/false \
                 --gecos "in dockerfile user" \
                 --ingroup $BUILD_GROUP \
                 --uid $BUILD_UID \
-                $BUILD_USER
+                $BUILD_USER && \
+            umask 0002 && \
+            mkdir /config && \
+            mkdir /data && \
+            mkdir /certs && \
+            mkdir /logs && \
+            chown $BUILD_UID:root /config && \
+            chown $BUILD_UID:root /data && \
+            chown $BUILD_UID:root /certs && \
+            chown $BUILD_UID:root /logs && \
+            chown -R $BUILD_UID:root . && \
+            chmod -R a+r .
 
 USER        $BUILD_USER
 
-ENV         STAGING=""
+ENV         OVERWRITE_CONFIG=""
+ENV         OVERWRITE_DATA=""
+ENV         OVERWRITE_CERTS=""
+
+ENV         DOMAIN="somewhere.tld"
 ENV         EMAIL="dubo-dubon-duponey@jsboot.space"
-ENV         CADDYPATH=$CADDYPATH
-ENV         DOMAIN=somewhere.tld
-ENV         PORT=1443
+ENV         STAGING=""
+ENV         CADDYPATH=/certs
 
-EXPOSE      $PORT
+ENV         HTTPS_PORT=1443
 
-VOLUME      $CONFIG
-VOLUME      $DATA
-VOLUME      $CADDYPATH
+EXPOSE      $HTTPS_PORT
 
 ENTRYPOINT  ["./entrypoint.sh"]
