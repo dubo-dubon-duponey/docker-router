@@ -19,6 +19,10 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
     * [✓] based on `debian:buster-slim`
     * [✓] simple entrypoint script
     * [✓] multi-stage build with no installed dependencies for the runtime image
+ * observable
+    * [✓] healthcheck
+    * [✓] prometheus endpoint
+    * [✓] log to stdout
 
 ## Run
 
@@ -78,7 +82,7 @@ docker run -d \
 
 The default setup uses a Caddy config file in `/config/caddy.conf` that sets-up a basic https server.
 
- * the `/certs` folder is used to store letsencrypt certificates (it's a volume by default, which you may want to mount)
+ * the `/certs` folder is used to store LetsEncrypt certificates (it's a volume by default, which you may want to mount)
  * the `/config` folder holds the configuration
 
 #### Runtime
@@ -91,11 +95,12 @@ You may specify the following environment variables at runtime:
 
 You can also tweak the following for control over which internal ports are being used (useful if intend to run with host/macvlan, see above)
 
- * HTTPS_PORT
+ * HTTPS_PORT (default to 1443)
+ * METRICS_PORT (default to 9253)
 
 Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and a root user.
 
-Finally, any additional arguments provided when running the image will get fed to the `coredns` binary.
+Finally, any additional arguments provided when running the image will get fed to the `caddy` binary.
 
 #### Build time
 
@@ -104,3 +109,7 @@ You can rebuild the image using the following build arguments:
  * BUILD_UID
  
 So to control which user-id to assign to the in-container user.
+
+### Prometheus
+
+The default configuration files expose a Prometheus metrics endpoint on port 9253.

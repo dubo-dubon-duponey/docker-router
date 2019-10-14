@@ -26,9 +26,9 @@ COPY          main.go cmd/caddy/main.go
 COPY          http-client.go cmd/http-client/http-client.go
 # Build it
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o dist/caddy ./cmd/caddy
-RUN           arch="${TARGETPLATFORM#*/}"; \
               env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o dist/http-client ./cmd/http-client
+RUN           arch="${TARGETPLATFORM#*/}"; \
+              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o dist/caddy ./cmd/caddy
 
 WORKDIR       /dist/bin
 RUN           cp "$GOPATH"/src/github.com/caddyserver/caddy/dist/caddy        .
@@ -49,10 +49,12 @@ ENV         STAGING=""
 
 ENV         CADDYPATH=/certs
 ENV         HTTPS_PORT=1443
+ENV         METRICS_PORT=9180
 
 # NOTE: this will not be updated at runtime and will always EXPOSE default values
 # Either way, EXPOSE does not do anything, except function as a documentation helper
 EXPOSE      $HTTPS_PORT/tcp
+EXPOSE      $METRICS_PORT/tcp
 
 # Default volumes certs, since these are expected to be writable
 VOLUME      /certs
