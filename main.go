@@ -3,12 +3,10 @@ package main
 import (
 	"github.com/caddyserver/caddy/caddy/caddymain"
 
-	// plug in plugins here, for example:
-	// _ "import/path/here"
+	_ "github.com/miekg/caddy-prometheus"
 )
 
 func main() {
-	// optional: disable telemetry
-	// caddymain.EnableTelemetry = false
+	caddymain.EnableTelemetry = false
 	caddymain.Run()
 }

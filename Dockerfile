@@ -6,15 +6,20 @@ FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder           
 
 # Versions: v2 2019/09/10
 #XXX BROKEN ARG         CADDY_VERSION=44b7ce98505ab8a34f6c632e661dd2cfae475a17
-
 # v2
 # https://github.com/caddyserver/caddy/wiki/v2:-Documentation#config-intro
 # ARG           CADDY_VERSION=b4f4fcd437c2f9816f9511217bde703679808679
 
 # v1.0.3
-ARG           CADDY_VERSION=bff2469d9d76ba5924f6d9affcf60bf44dcfa06c
+# ARG           CADDY_VERSION=bff2469d9d76ba5924f6d9affcf60bf44dcfa06c
 # master 19/10/11
-# ARG           CADDY_VERSION=24b2e02ee558ec8cbe4ed7b362a4d1065e573587
+ARG           CADDY_VERSION=99914d22043f707f3f69bb5ee509d3353d75e943
+
+ARG           PROM_VERSION=1fe4cb19becd5b9a1bf85ef841a2a348aa3d78e5
+
+WORKDIR       $GOPATH/src/github.com/miekg/caddy-prometheus
+RUN           git clone https://github.com/miekg/caddy-prometheus.git .
+RUN           git checkout $PROM_VERSION
 
 # Checkout and build
 WORKDIR       $GOPATH/src/github.com/caddyserver/caddy
@@ -50,6 +55,7 @@ ENV         STAGING=""
 ENV         CADDYPATH=/certs
 ENV         HTTPS_PORT=1443
 ENV         METRICS_PORT=9180
+ENV         HEALTHCHECK_URL=http://127.0.0.1:4000/healthcheck
 
 # NOTE: this will not be updated at runtime and will always EXPOSE default values
 # Either way, EXPOSE does not do anything, except function as a documentation helper
@@ -59,4 +65,4 @@ EXPOSE      $METRICS_PORT/tcp
 # Default volumes certs, since these are expected to be writable
 VOLUME      /certs
 
-HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=1 CMD DOMAIN=$DOMAIN HTTPS_PORT=$HTTPS_PORT http-client || exit 1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=1 CMD http-client || exit 1

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	url := fmt.Sprintf("https://%s:%s/healthcheck", os.Getenv("DOMAIN"), os.Getenv("PORT"))
+  url := fmt.Sprintf("%s", os.Getenv("HEALTHCHECK_URL"))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		os.Exit(1)

@@ -96,7 +96,7 @@ You may specify the following environment variables at runtime:
 You can also tweak the following for control over which internal ports are being used (useful if intend to run with host/macvlan, see above)
 
  * HTTPS_PORT (default to 1443)
- * METRICS_PORT (default to 9253)
+ * METRICS_PORT (default to 9180)
 
 Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and a root user.
 
