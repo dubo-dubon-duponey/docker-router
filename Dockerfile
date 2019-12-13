@@ -9,9 +9,7 @@ WORKDIR       $GOPATH/src/github.com/dubo-dubon-duponey/healthcheckers
 RUN           git clone git://github.com/dubo-dubon-duponey/healthcheckers .
 RUN           git checkout $HEALTH_VER
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/bin/http-health ./cmd/http
-
-RUN           chmod 555 /dist/bin/*
+              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/http-health ./cmd/http
 
 ##########################
 # Builder custom
@@ -46,9 +44,11 @@ COPY          main.go cmd/caddy/main.go
 
 # Build it
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/bin/caddy ./cmd/caddy
+              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/caddy ./cmd/caddy
 
-RUN           chmod 555 /dist/bin/*
+COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
+
+RUN           chmod 555 /dist/boot/bin/*
 
 #######################
 # Running image
@@ -56,8 +56,7 @@ RUN           chmod 555 /dist/bin/*
 FROM          dubodubonduponey/base:runtime
 
 # Get relevant bits from builder
-COPY          --from=builder /dist .
-COPY          --from=builder-healthcheck  /dist/bin/http-health /boot/bin/
+COPY          --from=builder --chown=$BUILD_UID:root /dist .
 
 ENV           DOMAIN="dev-null.farcloser.world"
 ENV           EMAIL="dubo-dubon-duponey@farcloser.world"
