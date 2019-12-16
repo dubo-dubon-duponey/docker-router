@@ -7,22 +7,22 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
 ## Image features
 
  * multi-architecture:
-    * [✓] linux/amd64
-    * [✓] linux/arm64
-    * [✓] linux/arm/v7
-    * [✓] linux/arm/v6
+    * [x] linux/amd64
+    * [x] linux/arm64
+    * [x] linux/arm/v7
+    * [x] linux/arm/v6
  * hardened:
-    * [✓] image runs read-only
-    * [✓] image runs with no capabilities
-    * [✓] process runs as a non-root user, disabled login, no shell
+    * [x] image runs read-only
+    * [x] image runs with no capabilities
+    * [x] process runs as a non-root user, disabled login, no shell
  * lightweight
-    * [✓] based on `debian:buster-slim`
-    * [✓] simple entrypoint script
-    * [✓] multi-stage build with no installed dependencies for the runtime image
+    * [x] based on our slim [Debian buster version](https://github.com/dubo-dubon-duponey/docker-debian)
+    * [x] simple entrypoint script
+    * [x] multi-stage build with no installed dependencies for the runtime image
  * observable
-    * [✓] healthcheck
-    * [✓] prometheus endpoint
-    * [✓] log to stdout
+    * [x] healthcheck
+    * [x] prometheus endpoint
+    * [x] log to stdout
 
 ## Run
 
@@ -38,8 +38,6 @@ docker run -d \
 ```
 
 You do need to expose port 443 publicly from your docker host so that LetsEncrypt can issue your certificate.
-
-## Notes
 
 ## Notes
 
