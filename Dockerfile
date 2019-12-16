@@ -1,7 +1,9 @@
 #######################
 # Extra builder for healthchecker
 #######################
-FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder                                                   AS builder-healthcheck
+ARG           BUILDER_BASE=dubodubonduponey/base:builder
+ARG           RUNTIME_BASE=dubodubonduponey/base:runtime
+FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder-healthcheck
 
 ARG           HEALTH_VER=51ebf8ca3d255e0c846307bf72740f731e6210c3
 
@@ -15,7 +17,7 @@ RUN           arch="${TARGETPLATFORM#*/}"; \
 # Builder custom
 # Custom steps required to build this specific image
 ##########################
-FROM          --platform=$BUILDPLATFORM dubodubonduponey/base:builder                                   AS builder
+FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder
 
 # Versions: v2 2019/09/10
 #XXX BROKEN ARG         CADDY_VERSION=44b7ce98505ab8a34f6c632e661dd2cfae475a17
@@ -53,7 +55,7 @@ RUN           chmod 555 /dist/boot/bin/*
 #######################
 # Running image
 #######################
-FROM          dubodubonduponey/base:runtime
+FROM          $RUNTIME_BASE
 
 # Get relevant bits from builder
 COPY          --from=builder --chown=$BUILD_UID:root /dist .
