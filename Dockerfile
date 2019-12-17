@@ -44,7 +44,7 @@ RUN           git clone https://github.com/caddyserver/caddy.git .
 RUN           git checkout $CADDY_VERSION
 
 # v1
-COPY          main.go cmd/caddy/main.go
+COPY          build/main.go cmd/caddy/main.go
 
 # Build it
 RUN           arch="${TARGETPLATFORM#*/}"; \
