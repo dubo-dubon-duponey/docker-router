@@ -21,8 +21,8 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
     * [x] multi-stage build with no installed dependencies for the runtime image
  * observable
     * [x] healthcheck
-    * [x] prometheus endpoint
     * [x] log to stdout
+    * [x] prometheus endpoint
 
 ## Run
 
@@ -100,14 +100,10 @@ Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and 
 
 Finally, any additional arguments provided when running the image will get fed to the `caddy` binary.
 
-#### Build time
-
-You can rebuild the image using the following build arguments:
-
- * BUILD_UID
- 
-So to control which user-id to assign to the in-container user.
-
 ### Prometheus
 
 The default configuration files expose a Prometheus metrics endpoint on port 9253.
+
+## Moar?
+
+See [DEVELOP.md](DEVELOP.md)

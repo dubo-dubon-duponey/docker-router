@@ -34,9 +34,16 @@ ARG           CADDY_VERSION=99914d22043f707f3f69bb5ee509d3353d75e943
 
 ARG           PROM_VERSION=1fe4cb19becd5b9a1bf85ef841a2a348aa3d78e5
 
+ARG           CACHE_VERSION=77032df0837be011283122f6ce041dc26ecd60c0
+
 WORKDIR       $GOPATH/src/github.com/miekg/caddy-prometheus
 RUN           git clone https://github.com/miekg/caddy-prometheus.git .
 RUN           git checkout $PROM_VERSION
+
+WORKDIR       $GOPATH/src/github.com/nicolasazrak/caddy-cache
+RUN           git clone https://github.com/nicolasazrak/caddy-cache.git .
+RUN           git checkout $CACHE_VERSION
+
 
 # Checkout and build
 WORKDIR       $GOPATH/src/github.com/caddyserver/caddy
@@ -44,7 +51,7 @@ RUN           git clone https://github.com/caddyserver/caddy.git .
 RUN           git checkout $CADDY_VERSION
 
 # v1
-COPY          main.go cmd/caddy/main.go
+COPY          build/main.go cmd/caddy/main.go
 
 # Build it
 RUN           arch="${TARGETPLATFORM#*/}"; \
@@ -66,6 +73,8 @@ COPY          --from=builder --chown=$BUILD_UID:root /dist .
 ENV           DOMAIN="dev-null.farcloser.world"
 ENV           EMAIL="dubo-dubon-duponey@farcloser.world"
 ENV           STAGING=""
+ENV           USERNAME=dmp
+ENV           PASSWORD=nhehehehe
 
 ENV           CADDYPATH=/certs
 ENV           HTTPS_PORT=1443
@@ -80,5 +89,6 @@ EXPOSE        $METRICS_PORT/tcp
 
 # Default volumes certs, since these are expected to be writable
 VOLUME        /certs
+# VOLUME        /tmp
 
 HEALTHCHECK   --interval=30s --timeout=30s --start-period=10s --retries=1 CMD http-health || exit 1
