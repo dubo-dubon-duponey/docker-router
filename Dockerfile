@@ -21,17 +21,10 @@ RUN           arch="${TARGETPLATFORM#*/}"; \
 # hadolint ignore=DL3006
 FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder
 
-# Versions: v2 2019/09/10
-#XXX BROKEN ARG         CADDY_VERSION=44b7ce98505ab8a34f6c632e661dd2cfae475a17
-# v2
-# https://github.com/caddyserver/caddy/wiki/v2:-Documentation#config-intro
-# ARG           CADDY_VERSION=b4f4fcd437c2f9816f9511217bde703679808679
+# 1.0.4
+ARG           CADDY_VERSION=aadda6e34e5b85b04670ecf3bb096dead3da61fc
 
-# v1.0.3
-# ARG           CADDY_VERSION=bff2469d9d76ba5924f6d9affcf60bf44dcfa06c
-# master 19/10/11
-ARG           CADDY_VERSION=99914d22043f707f3f69bb5ee509d3353d75e943
-
+# Caddy prometheus plugin
 ARG           PROM_VERSION=1fe4cb19becd5b9a1bf85ef841a2a348aa3d78e5
 
 ARG           CACHE_VERSION=77032df0837be011283122f6ce041dc26ecd60c0
