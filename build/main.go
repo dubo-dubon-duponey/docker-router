@@ -4,8 +4,8 @@ import (
 	"github.com/caddyserver/caddy/caddy/caddymain"
 
 	_ "github.com/miekg/caddy-prometheus"
-	// XXX doesn't seem to work (get 500) - commenting out for now
-	// _ "github.com/nicolasazrak/caddy-cache"
+	_ "github.com/nicolasazrak/caddy-cache"
+	_ "github.com/caddyserver/forwardproxy"
 )
 
 func main() {
