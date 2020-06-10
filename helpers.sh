@@ -4,7 +4,7 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]:-$PWD}")" 2>/dev/null 1>&2 && pwd)"
 
 # Settings defaults
-REGISTRY="${REGISTRY:-registry-1.docker.io}"
+REGISTRY="${REGISTRY:-index.docker.io}"
 VENDOR="${VENDOR:-dubodubonduponey}"
 IMAGE_NAME="${IMAGE_NAME:-untitled}"
 IMAGE_TAG="${IMAGE_TAG:-v1}"
@@ -17,12 +17,13 @@ BUILDER_BASE="${BUILDER_BASE:-dubodubonduponey/base:builder-${DEBIAN_DATE}}"
 RUNTIME_BASE="${RUNTIME_BASE:-dubodubonduponey/base:runtime-${DEBIAN_DATE}}"
 
 # Behavioral
-PROXY="${PROXY:-}"
-PUSH=
+APTPROXY="${APTPROXY:-}"
+GOPROXY="${GOPROXY:-}"
+PUSH=--push
 CACHE=
 NO_PUSH="${NO_PUSH:-}"
 NO_CACHE="${NO_CACHE:-}"
-[ "$NO_PUSH" ] || PUSH=--push
+[ "$NO_PUSH" ]  && PUSH="--output type=docker"
 [ ! "$NO_CACHE" ] || CACHE=--no-cache
 
 # Automated metadata
@@ -31,7 +32,7 @@ LICENSE="$(head -n 1 "$root/LICENSE")"
 # XXX it doesn't seem like BSD date can format the timezone appropriately according to RFC3339 - eg: %:z doesn't work and %z misses the colon, so the gymnastic here
 DATE="$(date +%Y-%m-%dT%T%z | sed -E 's/([0-9]{2})([0-9]{2})$/\1:\2/')"
 VERSION="$(git -C "$root" describe --match 'v[0-9]*' --dirty='.m' --always)"
-REVISION="$(git -C "$root" rev-parse HEAD)$(if ! git diff --no-ext-diff --quiet --exit-code; then printf ".m\\n"; fi)"
+REVISION="$(git -C "$root" rev-parse HEAD)$(if ! git -C "$root" diff --no-ext-diff --quiet --exit-code; then printf ".m\\n"; fi)"
 # XXX this is dirty, resolve ssh aliasing to github by default
 URL="$(git -C "$root" remote show -n origin | grep "Fetch URL")"
 URL="${URL#*Fetch URL: }"
@@ -57,7 +58,8 @@ fi
 docker buildx create --node "${VENDOR}0" --name "$VENDOR" > /dev/null
 docker buildx use "$VENDOR"
 
-docker buildx build --pull --platform "$PLATFORMS" \
+# shellcheck disable=SC2086
+docker buildx build --pull --platform "$PLATFORMS" --build-arg="FAIL_WHEN_OUTDATED=${FAIL_WHEN_OUTDATED:-}" \
   --build-arg="BUILDER_BASE=$BUILDER_BASE" \
   --build-arg="RUNTIME_BASE=$RUNTIME_BASE" \
   --build-arg="BUILD_CREATED=$DATE" \
@@ -71,8 +73,9 @@ docker buildx build --pull --platform "$PLATFORMS" \
   --build-arg="BUILD_REF_NAME=$REGISTRY/$VENDOR/$IMAGE_NAME:$IMAGE_TAG" \
   --build-arg="BUILD_TITLE=$TITLE" \
   --build-arg="BUILD_DESCRIPTION=$DESCRIPTION" \
-  --build-arg="http_proxy=$PROXY" \
-  --build-arg="https_proxy=$PROXY" \
+  --build-arg="APTPROXY=$APTPROXY" \
+  --build-arg="GOPROXY=$GOPROXY" \
+  --build-arg="GO111MODULE=${GO111MODULE:-on}" \
   --file "$DOCKERFILE" \
   --tag "$REGISTRY/$VENDOR/$IMAGE_NAME:$IMAGE_TAG" ${CACHE} ${PUSH} "$@" "$root"
 

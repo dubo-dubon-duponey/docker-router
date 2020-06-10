@@ -1,25 +1,32 @@
+ARG           BUILDER_BASE=dubodubonduponey/base:builder
+ARG           RUNTIME_BASE=dubodubonduponey/base:runtime
+
 #######################
 # Extra builder for healthchecker
 #######################
-ARG           BUILDER_BASE=dubodubonduponey/base:builder
-ARG           RUNTIME_BASE=dubodubonduponey/base:runtime
 # hadolint ignore=DL3006
 FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder-healthcheck
+
+#dmp RUN git config --global url."http://127.0.0.1:1081/github".insteadOf https://github.com
 
 ARG           GIT_REPO=github.com/dubo-dubon-duponey/healthcheckers
 ARG           GIT_VERSION=51ebf8ca3d255e0c846307bf72740f731e6210c3
 
 WORKDIR       $GOPATH/src/$GIT_REPO
-RUN           git clone git://$GIT_REPO .
+RUN           git clone https://$GIT_REPO .
 RUN           git checkout $GIT_VERSION
+
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -mod=vendor -v -ldflags "-s -w" -o /dist/boot/bin/http-health ./cmd/http
+              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" \
+                -o /dist/boot/bin/http-health ./cmd/http
 
 #######################
 # Builder custom
 #######################
 # hadolint ignore=DL3006
 FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder
+
+#dmp RUN git config --global url."http://127.0.0.1:1081/github".insteadOf https://github.com
 
 # This is 1.0.5
 ARG           GIT_REPO=github.com/caddyserver/caddy
@@ -39,7 +46,7 @@ ARG           PROXY_VERSION=247c0bafaabd39e17ecf82c2c957c46957c2efcc
 
 # Prometheus plugin
 WORKDIR       $GOPATH/src/$PROM_REPO
-RUN           git clone git://$PROM_REPO .
+RUN           git clone https://$PROM_REPO .
 RUN           git checkout $PROM_VERSION
 
 # Cache (XXX careful with conflicts between this and CORS)
@@ -54,16 +61,15 @@ RUN           git checkout $PROXY_VERSION
 
 # Checkout and build
 WORKDIR       $GOPATH/src/$GIT_REPO
-RUN           git clone git://$GIT_REPO .
+RUN           git clone https://$GIT_REPO .
 RUN           git checkout $GIT_VERSION
 
 # Copy over entrypoint
 COPY          build/main.go cmd/caddy/main.go
 
 # Build it
-# XXX -mod=vendor <- project does not vendor
 RUN           arch="${TARGETPLATFORM#*/}"; \
-              env GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/caddy ./cmd/caddy
+              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/caddy ./cmd/caddy
 
 COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
 RUN           chmod 555 /dist/boot/bin/*
@@ -89,8 +95,6 @@ ENV           HTTPS_PORT=1443
 ENV           PROXY_PORT=1081
 ENV           METRICS_PORT=9180
 
-ENV           HEALTHCHECK_URL=http://127.0.0.1:10042/healthcheck
-
 # NOTE: this will not be updated at runtime and will always EXPOSE default values
 # Either way, EXPOSE does not do anything, except function as a documentation helper
 EXPOSE        $HTTP_PORT/tcp
@@ -100,5 +104,7 @@ EXPOSE        $METRICS_PORT/tcp
 # Default volumes certs, since these are expected to be writable, and tmp folder for caching
 VOLUME        /certs
 VOLUME        /tmp
+
+ENV           HEALTHCHECK_URL=http://127.0.0.1:10042/healthcheck
 
 HEALTHCHECK   --interval=30s --timeout=30s --start-period=10s --retries=1 CMD http-health || exit 1
