@@ -44,6 +44,10 @@ ARG           CACHE_VERSION=77032df0837be011283122f6ce041dc26ecd60c0
 ARG           PROXY_REPO=github.com/caddyserver/forwardproxy
 ARG           PROXY_VERSION=247c0bafaabd39e17ecf82c2c957c46957c2efcc
 
+# Permission plugin
+ARG           PERM_REPO=github.com/dhaavi/caddy-permission
+ARG           PERM_VERSION=b16954bb0741752da81c36fb661d0619b416a52b
+
 # Prometheus plugin
 WORKDIR       $GOPATH/src/$PROM_REPO
 RUN           git clone https://$PROM_REPO .
@@ -58,6 +62,11 @@ RUN           git checkout $CACHE_VERSION
 WORKDIR       $GOPATH/src/$PROXY_REPO
 RUN           git clone https://$PROXY_REPO .
 RUN           git checkout $PROXY_VERSION
+
+# Permission plugin
+WORKDIR       $GOPATH/src/$PERM_REPO
+RUN           git clone https://$PERM_REPO .
+RUN           git checkout $PERM_VERSION
 
 # Checkout and build
 WORKDIR       $GOPATH/src/$GIT_REPO

@@ -6,6 +6,7 @@ import (
 	_ "github.com/miekg/caddy-prometheus"
 	_ "github.com/nicolasazrak/caddy-cache"
 	_ "github.com/caddyserver/forwardproxy"
+	_ "github.com/dhaavi/caddy-permission"
 )
 
 func main() {
