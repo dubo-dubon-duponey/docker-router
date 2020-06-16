@@ -34,7 +34,7 @@ docker run -d \
     --publish 443:1443/tcp \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 You do need to expose port 443 publicly from your docker host so that LetsEncrypt can issue your certificate.
@@ -56,7 +56,7 @@ docker run -d \
     --publish 443:1443 \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 ### Networking
@@ -73,7 +73,7 @@ docker run -d \
     --user root \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 ### Configuration reference
