@@ -7,6 +7,13 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
   exit 1
 }
 
+[ -w "/tmp" ] || {
+  >&2 printf "/tmp is not writable. Check your mount permissions.\n"
+  exit 1
+}
+
+mkdir -p /tmp/cache
+
 # Specifics to this image
 HTTPS_PORT="${HTTPS_PORT:-}"
 STAGING="${STAGING:-}"

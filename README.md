@@ -10,7 +10,7 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
     * [x] linux/amd64
     * [x] linux/arm64
     * [x] linux/arm/v7
-    * [x] linux/arm/v6
+    * [ ] linux/arm/v6 (should build, disabled by default)
  * hardened:
     * [x] image runs read-only
     * [x] image runs with no capabilities
@@ -34,7 +34,7 @@ docker run -d \
     --publish 443:1443/tcp \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 You do need to expose port 443 publicly from your docker host so that LetsEncrypt can issue your certificate.
@@ -56,7 +56,7 @@ docker run -d \
     --publish 443:1443 \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 ### Networking
@@ -73,7 +73,7 @@ docker run -d \
     --user root \
     --cap-drop ALL \
     --read-only \
-    dubodubonduponey/caddy:v1
+    dubodubonduponey/caddy
 ```
 
 ### Configuration reference
