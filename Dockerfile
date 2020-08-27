@@ -16,8 +16,8 @@ WORKDIR       $GOPATH/src/$GIT_REPO
 RUN           git clone https://$GIT_REPO .
 RUN           git checkout $GIT_VERSION
 
-RUN           arch="${TARGETPLATFORM#*/}"; \
-              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" \
+# hadolint ignore=DL4006
+RUN           env GOOS=linux GOARCH="$(printf "%s" "$TARGETPLATFORM" | sed -E 's/^[^/]+\/([^/]+).*/\1/')" go build -v -ldflags "-s -w" \
                 -o /dist/boot/bin/http-health ./cmd/http
 
 #######################
@@ -77,8 +77,9 @@ RUN           git checkout $GIT_VERSION
 COPY          build/main.go cmd/caddy/main.go
 
 # Build it
-RUN           arch="${TARGETPLATFORM#*/}"; \
-              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/caddy ./cmd/caddy
+# hadolint ignore=DL4006
+RUN           env GOOS=linux GOARCH="$(printf "%s" "$TARGETPLATFORM" | sed -E 's/^[^/]+\/([^/]+).*/\1/')" go build -v -ldflags "-s -w" \
+                -o /dist/boot/bin/caddy ./cmd/caddy
 
 COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
 RUN           chmod 555 /dist/boot/bin/*
