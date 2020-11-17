@@ -28,7 +28,8 @@ FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                           
 
 #dmp RUN git config --global url."http://127.0.0.1:1081/github".insteadOf https://github.com
 
-# This is 1.0.5
+# This is 1.0.5 (final?)
+# XXX move to v2 ASAP
 ARG           GIT_REPO=github.com/caddyserver/caddy
 ARG           GIT_VERSION=11ae1aa6b88e45b077dd97cb816fe06cd91cca67
 
