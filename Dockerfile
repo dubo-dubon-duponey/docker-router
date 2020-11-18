@@ -4,7 +4,7 @@ ARG           RUNTIME_BASE=dubodubonduponey/base:runtime
 #######################
 # Extra builder for healthchecker
 #######################
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3029
 FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder-healthcheck
 
 #dmp RUN git config --global url."http://127.0.0.1:1081/github".insteadOf https://github.com
@@ -16,19 +16,20 @@ WORKDIR       $GOPATH/src/$GIT_REPO
 RUN           git clone https://$GIT_REPO .
 RUN           git checkout $GIT_VERSION
 
-RUN           arch="${TARGETPLATFORM#*/}"; \
-              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" \
+# hadolint ignore=DL4006
+RUN           env GOOS=linux GOARCH="$(printf "%s" "$TARGETPLATFORM" | sed -E 's/^[^/]+\/([^/]+).*/\1/')" go build -v -ldflags "-s -w" \
                 -o /dist/boot/bin/http-health ./cmd/http
 
 #######################
 # Builder custom
 #######################
-# hadolint ignore=DL3006
+# hadolint ignore=DL3006,DL3029
 FROM          --platform=$BUILDPLATFORM $BUILDER_BASE                                                                   AS builder
 
 #dmp RUN git config --global url."http://127.0.0.1:1081/github".insteadOf https://github.com
 
-# This is 1.0.5
+# This is 1.0.5 (final?)
+# XXX move to v2 ASAP
 ARG           GIT_REPO=github.com/caddyserver/caddy
 ARG           GIT_VERSION=11ae1aa6b88e45b077dd97cb816fe06cd91cca67
 
@@ -77,8 +78,9 @@ RUN           git checkout $GIT_VERSION
 COPY          build/main.go cmd/caddy/main.go
 
 # Build it
-RUN           arch="${TARGETPLATFORM#*/}"; \
-              GOOS=linux GOARCH="${arch%/*}" go build -v -ldflags "-s -w" -o /dist/boot/bin/caddy ./cmd/caddy
+# hadolint ignore=DL4006
+RUN           env GOOS=linux GOARCH="$(printf "%s" "$TARGETPLATFORM" | sed -E 's/^[^/]+\/([^/]+).*/\1/')" go build -v -ldflags "-s -w" \
+                -o /dist/boot/bin/caddy ./cmd/caddy
 
 COPY          --from=builder-healthcheck /dist/boot/bin           /dist/boot/bin
 RUN           chmod 555 /dist/boot/bin/*

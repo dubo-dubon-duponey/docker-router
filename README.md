@@ -100,7 +100,7 @@ Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and 
 
 Finally, any additional arguments provided when running the image will get fed to the `caddy` binary.
 
-### Prometheus
+### Prometheus
 
 The default configuration files expose a Prometheus metrics endpoint on port 9253.
 
