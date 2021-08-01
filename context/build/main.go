@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/caddyserver/caddy/caddy/caddymain"
+	caddycmd "github.com/caddyserver/caddy/v2/cmd"
 
 	_ "github.com/miekg/caddy-prometheus"
-	_ "github.com/nicolasazrak/caddy-cache"
+	_ "github.com/sillygod/cdp-cache"
 	_ "github.com/caddyserver/forwardproxy"
 	_ "github.com/dhaavi/caddy-permission"
 )
 
 func main() {
-	caddymain.EnableTelemetry = false
-	caddymain.Run()
+	caddycmd.EnableTelemetry = false
+	caddycmd.Run()
 }
