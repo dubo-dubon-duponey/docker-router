@@ -49,7 +49,8 @@ RUN           echo "require $GIT_REPO_PROXY $GIT_COMMIT_PROXY" >> go.mod
 RUN           echo "require $GIT_REPO_PROM $GIT_COMMIT_PROM" >> go.mod
 RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
 RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
-COPY          build/main.go cmd/caddy/main.go
+# hadolint ignore=DL3045
+COPY          build/main.go ./cmd/caddy/main.go
 
 RUN           --mount=type=secret,id=CA \
               --mount=type=secret,id=NETRC \
