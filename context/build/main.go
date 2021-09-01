@@ -7,6 +7,7 @@ import (
 	_ "github.com/sillygod/cdp-cache"
 	_ "github.com/caddyserver/forwardproxy"
 	_ "github.com/dhaavi/caddy-permission"
+	_ "github.com/caddyserver/replace-response"
 )
 
 func main() {
