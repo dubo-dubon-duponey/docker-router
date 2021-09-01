@@ -1,9 +1,9 @@
 ARG           FROM_REGISTRY=ghcr.io/dubo-dubon-duponey
 
-ARG           FROM_IMAGE_BUILDER=base:builder-bullseye-2021-08-01@sha256:a49ab8a07a2da61eee63b7d9d33b091df190317aefb91203ad0ac41af18d5236
-ARG           FROM_IMAGE_AUDITOR=base:auditor-bullseye-2021-08-01@sha256:607d8b42af53ebbeb0064a5fd41895ab34ec670a810a704dbf53a2beb3ab769d
-ARG           FROM_IMAGE_RUNTIME=base:runtime-bullseye-2021-08-01@sha256:3fdb7b859e3fea12a7604ff4ae7e577628784ac1f6ea0d5609de65a4b26e5b3c
-ARG           FROM_IMAGE_TOOLS=tools:linux-bullseye-2021-08-01@sha256:9e54b76442e4d8e1cad76acc3c982a5623b59f395b594af15bef6b489862ceac
+ARG           FROM_IMAGE_BUILDER=base:builder-bullseye-2021-09-01@sha256:12be2a6d0a64b59b1fc44f9b420761ad92efe8188177171163b15148b312481a
+ARG           FROM_IMAGE_AUDITOR=base:auditor-bullseye-2021-09-01@sha256:28d5eddcbbee12bc671733793c8ea8302d7d79eb8ab9ba0581deeacabd307cf5
+ARG           FROM_IMAGE_RUNTIME=base:runtime-bullseye-2021-09-01@sha256:bbd3439247ea1aa91b048e77c8b546369138f910b5083de697f0d36ac21c1a8c
+ARG           FROM_IMAGE_TOOLS=tools:linux-bullseye-2021-09-01@sha256:e5535efb771ca60d2a371cd2ca2eb1a7d6b7b13cc5c4d27d48613df1a041431d
 
 FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                                                          AS builder-tools
 
@@ -27,8 +27,11 @@ RUN           git clone --recurse-submodules git://"$GIT_REPO" .; git checkout "
 
 # Forward proxy plugin
 ARG           GIT_REPO_PROXY=github.com/caddyserver/forwardproxy
-ARG           GIT_VERSION_PROXY=247c0ba
-ARG           GIT_COMMIT_PROXY=247c0bafaabd39e17ecf82c2c957c46957c2efcc
+#ARG           GIT_VERSION_PROXY=247c0ba
+#ARG           GIT_COMMIT_PROXY=247c0bafaabd39e17ecf82c2c957c46957c2efcc
+# XXX untested and unclear how it worked before
+ARG           GIT_VERSION_PROXY=b3a96fb
+ARG           GIT_COMMIT_PROXY=b3a96fb34dbe0ab2bfa051e69fddb225412fea62
 
 # Caddy prometheus plugin
 ARG           GIT_REPO_PROM=github.com/miekg/caddy-prometheus
@@ -37,18 +40,25 @@ ARG           GIT_COMMIT_PROM=1fe4cb19becd5b9a1bf85ef841a2a348aa3d78e5
 
 # Cache plugin
 ARG           GIT_REPO_CACHE=github.com/sillygod/cdp-cache
-ARG           GIT_VERSION_CACHE=b904cb7
-ARG           GIT_COMMIT_CACHE=b904cb7c7b81631d5217119981cc84b8773d10ed
+ARG           GIT_VERSION_CACHE=a00fa59
+ARG           GIT_COMMIT_CACHE=a00fa59f10239705c798c19261637d7d2cd4555e
 
 # Permission plugin
 ARG           GIT_REPO_PERM=github.com/dhaavi/caddy-permission
 ARG           GIT_VERSION_PERM=b16954b
 ARG           GIT_COMMIT_PERM=b16954bb0741752da81c36fb661d0619b416a52b
 
+# Replace in response plugin
+ARG           GIT_REPO_REPLACE=github.com/caddyserver/replace-response
+ARG           GIT_VERSION_REPLACE=9d5652c
+ARG           GIT_COMMIT_REPLACE=9d5652c0256308fddaef1453d463d2a281498cb6
+
 RUN           echo "require $GIT_REPO_PROXY $GIT_COMMIT_PROXY" >> go.mod
 RUN           echo "require $GIT_REPO_PROM $GIT_COMMIT_PROM" >> go.mod
 RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
 RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
+RUN           echo "require $GIT_REPO_REPLACE $GIT_COMMIT_REPLACE" >> go.mod
+
 # hadolint ignore=DL3045
 COPY          build/main.go ./cmd/caddy/main.go
 
