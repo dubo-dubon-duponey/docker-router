@@ -16,7 +16,7 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
   * [x] linux/s390x
 * hardened:
   * [x] image runs read-only
-  * [x] image runs with no capabilities (unless you want it on a privileged port)
+  * [x] image runs with no capabilities but NET_BIND_SERVICE
   * [x] process runs as a non-root user, disabled login, no shell
 * lightweight
   * [x] based on our slim [Debian Bullseye](https://github.com/dubo-dubon-duponey/docker-debian)
