@@ -10,7 +10,7 @@ FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                  
 #######################
 # Fecthers
 #######################
-FROM          --platform=$BUILDPLATFORM $FROM_REGISTRY/$FROM_IMAGE_BUILDER                                              AS fetcher-caddy
+FROM          --platform=$BUILDPLATFORM $FROM_REGISTRY/$FROM_IMAGE_BUILDER                                              AS fetcher-main
 
 ARG           GIT_REPO=github.com/caddyserver/caddy
 ARG           GIT_VERSION=v2.4.3
@@ -53,10 +53,13 @@ ARG           GIT_REPO_REPLACE=github.com/caddyserver/replace-response
 ARG           GIT_VERSION_REPLACE=9d5652c
 ARG           GIT_COMMIT_REPLACE=9d5652c0256308fddaef1453d463d2a281498cb6
 
-RUN           echo "require $GIT_REPO_PROXY $GIT_COMMIT_PROXY" >> go.mod
-RUN           echo "require $GIT_REPO_PROM $GIT_COMMIT_PROM" >> go.mod
+# XXX probably does not work with caddy 2, and also has a problem with github.com/mholt/caddy v1.0.0
+# RUN           echo "replace github.com/tencentcloud/tencentcloud-sdk-go v3.0.82+incompatible => github.com/tencentcloud/tencentcloud-sdk-go v1.0.191" >> go.mod
+# RUN           echo "require $GIT_REPO_PROXY $GIT_COMMIT_PROXY" >> go.mod
+# Seems to be caddy 1 too
+# RUN           echo "require $GIT_REPO_PROM $GIT_COMMIT_PROM" >> go.mod
 RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
-RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
+# RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
 RUN           echo "require $GIT_REPO_REPLACE $GIT_COMMIT_REPLACE" >> go.mod
 
 # hadolint ignore=DL3045
