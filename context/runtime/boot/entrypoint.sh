@@ -47,5 +47,5 @@ if [ "$GHOST_TARGET" ]; then
   [ "${PROXY_HTTPS_ENABLED:-}" != true ] || start::sidecar &
   sidecar::tls::start "$GHOST_PORT" "$GHOST_TARGET"
 else
-  [ "${PROXY_HTTPS_ENABLED:-}" != true ] || start::sidecar &
+  [ "${PROXY_HTTPS_ENABLED:-}" != true ] || start::sidecar
 fi
