@@ -5,8 +5,10 @@ import (
 
 	_ "github.com/caddyserver/caddy/v2/modules/standard"
 
+	// Testing if this is broken
+	// _ "github.com/sillygod/cdp-cache"
+
 	// _ "github.com/miekg/caddy-prometheus"
-	_ "github.com/sillygod/cdp-cache"
 	// _ "github.com/caddyserver/forwardproxy"
 	// _ "github.com/dhaavi/caddy-permission"
 	_ "github.com/caddyserver/replace-response"
