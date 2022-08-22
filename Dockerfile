@@ -1,17 +1,17 @@
-ARG           FROM_REGISTRY=ghcr.io/dubo-dubon-duponey
+ARG           FROM_REGISTRY=index.docker.io/dubodubonduponey
 
-ARG           FROM_IMAGE_BUILDER=base:builder-bullseye-2022-05-01@sha256:b97738238e9d1423b6de8d5a96f4310ae7039ffa4af19cd6a85f5f70d0faef99
-ARG           FROM_IMAGE_AUDITOR=base:auditor-bullseye-2022-05-01@sha256:984cf8672b483ca94333b5b37e19a95b115047dee05955767ed5b1bac1140e0c
-ARG           FROM_IMAGE_RUNTIME=base:runtime-bullseye-2022-05-01@sha256:5e44963d961cf7594cf8a0d1bba98fd5da69d7881cb77c142a43ceab230e87df
-ARG           FROM_IMAGE_TOOLS=tools:linux-bullseye-2022-05-01@sha256:6268013e3bd16eaaf7dd15c7689f8740bd00af1149c92795cc42fab4f3c6d07a
+ARG           FROM_IMAGE_BUILDER=base:builder-bullseye-2022-08-01
+ARG           FROM_IMAGE_AUDITOR=base:auditor-bullseye-2022-08-01
+ARG           FROM_IMAGE_RUNTIME=base:runtime-bullseye-2022-08-01
+ARG           FROM_IMAGE_TOOLS=tools:linux-bullseye-2022-08-01
 
 FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                                                          AS builder-tools
 
 FROM          --platform=$BUILDPLATFORM $FROM_REGISTRY/$FROM_IMAGE_BUILDER                                              AS fetcher-ghost
 
 ARG           GIT_REPO=github.com/ghostunnel/ghostunnel
-ARG           GIT_VERSION=v1.6.0
-ARG           GIT_COMMIT=5a237d19fc2cb7db4fa82b10b207ef2efd909cb5
+ARG           GIT_VERSION=v1.6.1
+ARG           GIT_COMMIT=374acefca8436e954208425b48d919a12afd67bf
 
 ENV           WITH_BUILD_SOURCE="."
 ENV           WITH_BUILD_OUTPUT="ghostunnel"
@@ -113,8 +113,11 @@ ARG           GIT_COMMIT_REPLACE=d32dc3ffff0c07a3c935ef33092803f90c55ba19
 # RUN           echo "require $GIT_REPO_PROXY $GIT_COMMIT_PROXY" >> go.mod
 # Seems to be caddy 1 too
 # RUN           echo "require $GIT_REPO_PROM $GIT_COMMIT_PROM" >> go.mod
-RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
 # RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
+
+# Seem to crash everything at this point
+#RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
+
 RUN           echo "require $GIT_REPO_REPLACE $GIT_COMMIT_REPLACE" >> go.mod
 
 # hadolint ignore=DL3045
