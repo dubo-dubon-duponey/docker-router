@@ -37,7 +37,7 @@ docker run -d \
     --publish 443:1443/tcp \
     --cap-drop ALL \
     --read-only \
-    index.docker.io/dubodubonduponey/router
+    docker.io/dubodubonduponey/router
 ```
 
 You do need to expose port 443 publicly from your docker host so that LetsEncrypt can issue your certificate.
@@ -59,7 +59,7 @@ docker run -d \
     --publish 443:1443 \
     --cap-drop ALL \
     --read-only \
-    index.docker.io/dubodubonduponey/router
+    docker.io/dubodubonduponey/router
 ```
 
 ### Networking
@@ -76,7 +76,7 @@ docker run -d \
     --user root \
     --cap-drop ALL \
     --read-only \
-    index.docker.io/dubodubonduponey/router
+    docker.io/dubodubonduponey/router
 ```
 
 ### Configuration reference
