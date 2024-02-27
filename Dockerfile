@@ -1,9 +1,9 @@
 ARG           FROM_REGISTRY=docker.io/dubodubonduponey
 
-ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2023-09-05
-ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2023-09-05
-ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2023-09-05
-ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2023-09-05
+ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2024-02-20
+ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2024-02-20
+ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2024-02-20
+ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2024-02-20
 
 FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                                                          AS builder-tools
 
@@ -98,15 +98,15 @@ ARG           GIT_REPO_PROM=github.com/miekg/caddy-prometheus
 ARG           GIT_VERSION_PROM=1fe4cb1
 ARG           GIT_COMMIT_PROM=1fe4cb19becd5b9a1bf85ef841a2a348aa3d78e5
 
-# Cache plugin
-ARG           GIT_REPO_CACHE=github.com/caddyserver/cache-handler
-ARG           GIT_VERSION_CACHE=v0.11.0
-ARG           GIT_COMMIT_CACHE=a3fd43026ed8268d369c553588c606cf0ae80817
-
 # Permission plugin
 ARG           GIT_REPO_PERM=github.com/dhaavi/caddy-permission
 ARG           GIT_VERSION_PERM=b16954b
 ARG           GIT_COMMIT_PERM=b16954bb0741752da81c36fb661d0619b416a52b
+
+# Cache plugin
+ARG           GIT_REPO_CACHE=github.com/caddyserver/cache-handler
+ARG           GIT_VERSION_CACHE=v0.11.0
+ARG           GIT_COMMIT_CACHE=a3fd43026ed8268d369c553588c606cf0ae80817
 
 # Replace in response plugin
 ARG           GIT_REPO_REPLACE=github.com/caddyserver/replace-response
@@ -123,8 +123,7 @@ ARG           GIT_COMMIT_REPLACE=a85d4ddc11d635c093074205bd32f56d05fc7811
 # RUN           echo "require $GIT_REPO_PERM $GIT_COMMIT_PERM" >> go.mod
 
 # Seem to crash everything at this point
-#RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
-
+RUN           echo "require $GIT_REPO_CACHE $GIT_COMMIT_CACHE" >> go.mod
 RUN           echo "require $GIT_REPO_REPLACE $GIT_COMMIT_REPLACE" >> go.mod
 
 # hadolint ignore=DL3045
@@ -132,7 +131,7 @@ COPY          build/main.go ./cmd/caddy/main.go
 
 RUN           --mount=type=secret,id=CA \
               --mount=type=secret,id=NETRC \
-              go mod tidy -compat=1.17; \
+              go mod tidy; \
               [[ "${GOFLAGS:-}" == *-mod=vendor* ]] || go mod download
 
 #######################
@@ -166,6 +165,8 @@ RUN           export GOARM="$(printf "%s" "$TARGETVARIANT" | tr -d v)"; \
                 WITH_LDFLAGS="${WITH_LDFLAGS:-} -linkmode=external -extld="$CC" -extldflags \"${LDFLAGS:-} ${ENABLE_STATIC:+-static}${ENABLE_PIE:+-pie}\""; \
                 WITH_TAGS="${WITH_TAGS:-} cgo ${ENABLE_STATIC:+static static_build}"; \
               }; \
+              \
+              echo go build -ldflags "-s -w -v ${WITH_LDFLAGS:-}" -tags "${WITH_TAGS:-} net${WITH_CGO_NET:+c}go osusergo" -o /dist/boot/bin/"$WITH_BUILD_OUTPUT" "$WITH_BUILD_SOURCE"; \
               go build -ldflags "-s -w -v ${WITH_LDFLAGS:-}" -tags "${WITH_TAGS:-} net${WITH_CGO_NET:+c}go osusergo" -o /dist/boot/bin/"$WITH_BUILD_OUTPUT" "$WITH_BUILD_SOURCE"
 
 #######################
