@@ -1,9 +1,9 @@
 ARG           FROM_REGISTRY=docker.io/dubodubonduponey
 
-ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2024-02-20
-ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2024-02-20
-ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2024-02-20
-ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2024-02-20
+ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2024-03-01
+ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2024-03-01
+ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2024-03-01
+ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2024-03-01
 
 FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                                                          AS builder-tools
 
@@ -89,8 +89,8 @@ ARG           GIT_REPO_PROXY=github.com/caddyserver/forwardproxy
 #ARG           GIT_VERSION_PROXY=8c6ef2b
 #ARG           GIT_COMMIT_PROXY=8c6ef2bd4a8f40340b3ecd249f8eed058c567b76
 #
-ARG           GIT_VERSION_PROXY=c8ab19b
-ARG           GIT_COMMIT_PROXY=c8ab19b557a8d3521cf22a89f90894404774b709
+ARG           GIT_VERSION_PROXY=ec06192
+ARG           GIT_COMMIT_PROXY=ec0619230bc094fcd1ab0513fe2ac6828c000800
 
 
 # Caddy prometheus plugin
@@ -105,13 +105,11 @@ ARG           GIT_COMMIT_PERM=b16954bb0741752da81c36fb661d0619b416a52b
 
 # Cache plugin
 ARG           GIT_REPO_CACHE=github.com/caddyserver/cache-handler
-ARG           GIT_VERSION_CACHE=v0.11.0
-ARG           GIT_COMMIT_CACHE=a3fd43026ed8268d369c553588c606cf0ae80817
+ARG           GIT_VERSION_CACHE=v0.12.0
+ARG           GIT_COMMIT_CACHE=3d544e30f495baba123590078e402890da3bf20c
 
 # Replace in response plugin
 ARG           GIT_REPO_REPLACE=github.com/caddyserver/replace-response
-#ARG           GIT_VERSION=d7523f4
-#ARG           GIT_COMMIT_REPLACE=d7523f42f84a2fa09d64c957f1e6795ece355425
 ARG           GIT_VERSION_REPLACE=a85d4dd
 ARG           GIT_COMMIT_REPLACE=a85d4ddc11d635c093074205bd32f56d05fc7811
 

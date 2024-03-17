@@ -2,7 +2,7 @@
 set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 
 tls::start(){
-  local port="$1"
+  local bind="$1"
   local target="$2"
 
   local flags=(--cacert "${ADVANCED_MOD_MTLS_TRUST:-$_default_mod_mtls_trust}" \
@@ -12,5 +12,5 @@ tls::start(){
   )
 
   # --disable-authentication
-  ghostunnel "${flags[@]}" server --listen "0.0.0.0:$port" --target "$target" --allow-all
+  ghostunnel "${flags[@]}" server --listen "$bind" --target "$target" --allow-all &
 }

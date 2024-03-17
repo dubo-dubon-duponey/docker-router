@@ -4,13 +4,13 @@ set -o errexit -o errtrace -o functrace -o nounset -o pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]:-$PWD}")" 2>/dev/null 1>&2 && pwd)"
 readonly root
 # shellcheck source=/dev/null
-source "$root/helpers.sh"
+. "$root/helpers.sh"
 # shellcheck source=/dev/null
-source "$root/mdns.sh"
+. "$root/mdns.sh"
 # shellcheck source=/dev/null
-source "$root/http.sh"
+. "$root/http.sh"
 # shellcheck source=/dev/null
-source "$root/tls.sh"
+. "$root/tls.sh"
 
 helpers::dir::writable "/certs"
 helpers::dir::writable "$XDG_DATA_HOME" create
@@ -49,13 +49,14 @@ esac
   }
   [ "${ADVANCED_MOD_MDNS_STATION:-}" != true ] || mdns::records::add "_workstation._tcp" "${MOD_MDNS_HOST}" "${MOD_MDNS_NAME:-}" "$_mdns_port"
   mdns::records::add "$_mdns_type" "${MOD_MDNS_HOST:-}" "${MOD_MDNS_NAME:-}" "$_mdns_port"
-  mdns::start::broadcaster &
+  mdns::start::broadcaster
 }
 
 # TLS and HTTP
+# shellcheck disable=SC2015
 [ "${MOD_TLS_ENABLED:-}" == true ] && {
   [ "${MOD_HTTP_ENABLED:-}" != true ] || http::start &
-  tls::start "$MOD_TLS_PORT" "$MOD_TLS_TARGET"
+  tls::start ":$MOD_TLS_PORT" "$MOD_TLS_TARGET"
 } || {
   [ "${MOD_HTTP_ENABLED:-}" != true ] || http::start
 }
