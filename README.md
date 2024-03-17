@@ -8,20 +8,15 @@ This is based on [Caddy](https://github.com/caddyserver/caddy/).
 
 * multi-architecture:
   * [x] linux/amd64
-  * [x] linux/386
   * [x] linux/arm64
-  * [x] linux/arm/v7
-  * [x] linux/arm/v6
-  * [x] linux/ppc64le
-  * [x] linux/s390x
 * hardened:
   * [x] image runs read-only
-  * [x] image runs with no capabilities but NET_BIND_SERVICE
+  * [x] image runs with no capabilities (you need NET_BIND_SERVICE if you want to use privileged ports obviously)
   * [x] process runs as a non-root user, disabled login, no shell
 * lightweight
-  * [x] based on our slim [Debian Bullseye](https://github.com/dubo-dubon-duponey/docker-debian)
+  * [x] based on our slim [Debian Bookworm](https://github.com/dubo-dubon-duponey/docker-debian)
   * [x] simple entrypoint script
-  * [x] multi-stage build with no installed dependencies for the runtime image
+  * [x] multi-stage build with zero packages installed in the runtime image
 * observable
   * [x] healthcheck
   * [x] log to stdout
@@ -97,7 +92,7 @@ You may specify the following environment variables at runtime:
 You can also tweak the following for control over which internal ports are being used (useful if intend to run with host/macvlan, see above)
 
  * HTTPS_PORT (default to 1443)
- * METRICS_LISTEN (default to 9180)
+ * MOD_METRICS_BIND (default to 4242)
 
 Of course using any privileged port for these requires CAP_NET_BIND_SERVICE and a root user.
 
