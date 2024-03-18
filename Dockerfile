@@ -217,7 +217,7 @@ ENV           MOD_MDNS_HOST="$_SERVICE_NICK"
 #####
 # Mod TLS
 #####
-# Whether to enable client certificate validation or not
+# Whether to start our TLS termination proxy or not
 ENV           MOD_TLS_ENABLED=false
 ENV           MOD_TLS_TARGET=""
 ENV           ADVANCED_MOD_TLS_PORT=443
@@ -225,7 +225,7 @@ ENV           ADVANCED_MOD_TLS_PORT=443
 #####
 # Mod mTLS
 #####
-# Whether to enable client certificate validation or not
+# Whether to enable client certificate validation or not (Caddy only for now - since ghost would use OPA instead)
 ENV           MOD_MTLS_ENABLED=false
 # Either require_and_verify or verify_if_given
 ENV           MOD_MTLS_MODE="verify_if_given"
