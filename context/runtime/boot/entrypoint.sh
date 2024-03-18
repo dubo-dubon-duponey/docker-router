@@ -21,36 +21,35 @@ helpers::dir::writable "$XDG_STATE_HOME" create
 helpers::dir::writable "$XDG_CACHE_HOME" create
 
 # HTTP helpers
-case "${1:-}" in
-  # Short hand helper to generate password hash
-  "hash")
-    shift
-    http::hash "$@"
-    exit
-  ;;
-  # Helper to get the ca.crt out (once initialized)
-  "cert")
-    shift
-    http::certificate "${MOD_HTTP_TLS_MODE:-internal}" "$@"
-    exit
-  ;;
-esac
+if [ "$MOD_HTTP_ENABLED" == true ]; then
+  case "${1:-}" in
+    # Short hand helper to generate password hash
+    "hash")
+      shift
+      http::hash "$@"
+      exit
+    ;;
+    # Helper to get the ca.crt out (once initialized)
+    "cert")
+      shift
+      http::certificate "${MOD_HTTP_TLS_MODE:-internal}" "$@"
+      exit
+    ;;
+  esac
+fi
 
-# mDNS
-[ "${MOD_MDNS_ENABLED:-}" != true ] || {
-  _mdns_type="${ADVANCED_MOD_MDNS_TYPE:-}"
-  [ "${MOD_HTTP_ENABLED:-}" != true ] || {
-    _mdns_port="$([ "${MOD_HTTP_TLS_ENABLED:-}" == true ] && printf "%s" "${ADVANCED_MOD_HTTP_PORT:-443}" || printf "%s" "${ADVANCED_MOD_HTTP_PORT_INSECURE:-80}")"
-    _mdns_type="_http._tcp"
-  }
-  [ "${MOD_TLS_ENABLED:-}" != true ] || {
-    _mdns_port="${MOD_TLS_PORT:-443}"
-    _mdns_type="_tls._tcp"
-  }
-  [ "${ADVANCED_MOD_MDNS_STATION:-}" != true ] || mdns::records::add "_workstation._tcp" "${MOD_MDNS_HOST}" "${MOD_MDNS_NAME:-}" "$_mdns_port"
-  mdns::records::add "$_mdns_type" "${MOD_MDNS_HOST:-}" "${MOD_MDNS_NAME:-}" "$_mdns_port"
-  mdns::start::broadcaster
-}
+[ "${MOD_MDNS_ENABLED:-}" != true ] || \
+  mdns::start::default \
+    "${MOD_MDNS_HOST:-}" \
+    "${MOD_MDNS_NAME:-}" \
+    "${MOD_HTTP_ENABLED:-}" \
+    "${MOD_HTTP_TLS_ENABLED:-}" \
+    "${MOD_TLS_ENABLED:-}" \
+    "${ADVANCED_MOD_MDNS_STATION:-}" \
+    "${ADVANCED_MOD_MDNS_TYPE:-}" \
+    "${ADVANCED_MOD_HTTP_PORT:-}" \
+    "${ADVANCED_MOD_HTTP_PORT_INSECURE:-}" \
+    "${ADVANCED_MOD_TLS_PORT:-}"
 
 # TLS and HTTP
 # shellcheck disable=SC2015
