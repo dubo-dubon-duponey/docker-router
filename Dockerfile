@@ -1,17 +1,19 @@
 ARG           FROM_REGISTRY=docker.io/dubodubonduponey
 
-ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2024-03-01
-ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2024-03-01
-ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2024-03-01
-ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2024-03-01
+ARG           FROM_IMAGE_BUILDER=base:builder-bookworm-2025-05-01
+ARG           FROM_IMAGE_AUDITOR=base:auditor-bookworm-2025-05-01
+ARG           FROM_IMAGE_RUNTIME=base:runtime-bookworm-2025-05-01
+ARG           FROM_IMAGE_TOOLS=tools:linux-bookworm-2025-05-01
 
 FROM          $FROM_REGISTRY/$FROM_IMAGE_TOOLS                                                                          AS builder-tools
 
 FROM          --platform=$BUILDPLATFORM $FROM_REGISTRY/$FROM_IMAGE_BUILDER                                              AS fetcher-ghost
 
 ARG           GIT_REPO=github.com/ghostunnel/ghostunnel
-ARG           GIT_VERSION=v1.7.3
-ARG           GIT_COMMIT=0e0510cd4a6e685fe8c80ced0b2a64c2444eb287
+ARG           GIT_VERSION=v1.8.4
+ARG           GIT_COMMIT=cd77be58daf61fdc5935853fded7d85e61ab605f
+
+ENV           CGO_ENABLED=1
 
 ENV           WITH_BUILD_SOURCE="."
 ENV           WITH_BUILD_OUTPUT="ghostunnel"
@@ -66,8 +68,10 @@ ARG           GIT_REPO=github.com/caddyserver/caddy
 #ARG           GIT_COMMIT=e7457b43e4703080ae8713ada798ce3e20b83690
 #ARG           GIT_VERSION=v2.5.2
 #ARG           GIT_COMMIT=ad3a83fb9169899226ce12a61c16b5bf4d03c482
-ARG           GIT_VERSION=v2.7.6
-ARG           GIT_COMMIT=6d9a83376b5e19b3c0368541ee46044ab284038b
+#ARG           GIT_VERSION=v2.7.6
+#ARG           GIT_COMMIT=6d9a83376b5e19b3c0368541ee46044ab284038b
+ARG           GIT_VERSION=v2.10.0
+ARG           GIT_COMMIT=fb22a26b1a08a2fa3b2526d1852467904ee140f6
 
 ENV           WITH_BUILD_SOURCE="./cmd/caddy"
 ENV           WITH_BUILD_OUTPUT="caddy"
@@ -105,8 +109,8 @@ ARG           GIT_COMMIT_PERM=b16954bb0741752da81c36fb661d0619b416a52b
 
 # Cache plugin
 ARG           GIT_REPO_CACHE=github.com/caddyserver/cache-handler
-ARG           GIT_VERSION_CACHE=v0.12.0
-ARG           GIT_COMMIT_CACHE=3d544e30f495baba123590078e402890da3bf20c
+ARG           GIT_VERSION_CACHE=v0.15.0
+ARG           GIT_COMMIT_CACHE=507cbf6c1f4d49989b9c8519b2e45139a035782c
 
 # Replace in response plugin
 ARG           GIT_REPO_REPLACE=github.com/caddyserver/replace-response
@@ -286,12 +290,7 @@ ENV           ADVANCED_MOD_HTTP_ADDITIONAL_DOMAINS=""
 EXPOSE        443
 EXPOSE        80
 
-# Caddy certs will be stored here
-VOLUME        /certs
-# Caddy uses this
-VOLUME        /tmp
-# Used by the backend service
-VOLUME        /data
+VOLUME        "$XDG_DATA_HOME"
 
 ENV           HEALTHCHECK_URL="http://127.0.0.1:10000/?healthcheck"
 

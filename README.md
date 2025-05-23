@@ -41,7 +41,7 @@ You do need to expose port 443 publicly from your docker host so that LetsEncryp
 
 ### Custom configuration file
 
-If you want to customize your Caddy config, mount a volume into `/config` on the container and customize `/config/caddy.conf`.
+If you want to customize your Caddy config, mount a volume into `/magnetar/user/config` on the container and customize `caddy/main.conf`.
 
 ```bash
 chown -R 1000:nogroup "[host_path_for_config]"
